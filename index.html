@@ -561,6 +561,7 @@
         <button type="button" class="btn-accent" onclick="addBatch()">+ إضافة فرزة جديدة (S • M • L • XL)</button>
         <button type="button" class="btn-primary" onclick="saveState(true)">حفظ البيانات</button>
         <button type="button" class="btn-outline" onclick="window.print()">طباعة</button>
+        <button type="button" class="btn-outline" onclick="exportToExcel()">تصدير إكسيل (Excel)</button>
         <button type="button" class="btn-danger-outline" onclick="resetShift()">وردية جديدة</button>
         <button type="button" class="btn-outline" onclick="syncFromFirebase(true)">مزامنة من السيرفر</button>
         <button type="button" class="btn-primary" onclick="pushToFirebase(true)">رفع البيانات للسيرفر</button>
@@ -759,6 +760,17 @@
       }
     }
 
+    function getShiftArchiveKey() {
+      const safeDate = (state.date || getTodayYYYYMMDD()).replace(/[^0-9-]/g, "");
+      const shiftMap = {
+        "الوردية الأولى": "shift1",
+        "الوردية الثانية": "shift2",
+        "الوردية الثالثة": "shift3"
+      };
+      const sCode = shiftMap[state.shift] || "shift";
+      return `${safeDate}_${sCode}`;
+    }
+
     async function pushToFirebase(showFeedback = false) {
       renumberBatches();
       const payload = {
@@ -766,12 +778,21 @@
         updatedAt: Date.now()
       };
       try {
-        const res = await fetch(getFirebaseEndpoint(false), {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const cleanBase = FIREBASE_DB_URL.replace(/\/+$/, "");
+        const archiveKey = getShiftArchiveKey();
+        const [resCurrent, resArchive] = await Promise.all([
+          fetch(getFirebaseEndpoint(false), {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          }),
+          fetch(`${cleanBase}/gloveops/archive/${archiveKey}.json`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          })
+        ]);
+        if (!resCurrent.ok || !resArchive.ok) throw new Error(`HTTP ${resCurrent.status}`);
         setStatusText(showFeedback ? "تم الحفظ على السيرفر" : "محفوظ على السيرفر");
       } catch (e) {
         console.error(e);
@@ -1328,6 +1349,151 @@
       document.getElementById("shiftDate").value = state.date;
       renderBatches();
       renderFinalReport();
+    }
+
+
+    function exportToExcel() {
+      renumberBatches();
+      const sa = analyzeAllShift();
+      const escXml = (v) =>
+        String(v ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+
+      let rowsDetailed = `
+        <tr>
+          <th>التاريخ</th>
+          <th>الوردية</th>
+          <th>مهندس الوردية</th>
+          <th>رقم الفرزة</th>
+          <th>معاد الفرزة</th>
+          <th>المقاس</th>
+          <th>المفروز</th>
+          <th>المعيب</th>
+          <th>نسبة العيوب %</th>
+          <th>تفاصيل العيوب</th>
+        </tr>
+      `;
+
+      state.batches.forEach((b) => {
+        const ba = analyzeBatch(b);
+        SIZES.forEach((sz) => {
+          const entry = b.sizes[sz];
+          const s = ba.bySize[sz];
+          const defsStr =
+            entry.defects
+              .filter((d) => (Number(d.count) || 0) > 0 || getDefectLabel(d) !== "")
+              .map((d) => `${getDefectLabel(d)} (${Number(d.count) || 0})`)
+              .join(" | ") || "لا يوجد";
+
+          rowsDetailed += `
+            <tr>
+              <td>${escXml(state.date)}</td>
+              <td>${escXml(state.shift)}</td>
+              <td>${escXml(state.engineer || "غير محدد")}</td>
+              <td>${b.number}</td>
+              <td>${escXml(b.time || "")}</td>
+              <td>${sz}</td>
+              <td>${s.inspected}</td>
+              <td>${s.defective}</td>
+              <td>${s.rate.toFixed(2)}%</td>
+              <td>${escXml(defsStr)}</td>
+            </tr>
+          `;
+        });
+      });
+
+      let rowsSummary = `
+        <tr><td colspan="10"></td></tr>
+        <tr><th colspan="4">ملخص المقاسات للوردية</th></tr>
+        <tr>
+          <th>المقاس</th>
+          <th>إجمالي المفروز</th>
+          <th>إجمالي المعيب</th>
+          <th>نسبة العيوب %</th>
+        </tr>
+      `;
+
+      SIZES.forEach((sz) => {
+        const st = sa.sizeTotals[sz];
+        const r = st.inspected > 0 ? ((st.defective / st.inspected) * 100).toFixed(2) : "0.00";
+        rowsSummary += `
+          <tr>
+            <td>${sz}</td>
+            <td>${st.inspected}</td>
+            <td>${st.defective}</td>
+            <td>${r}%</td>
+          </tr>
+        `;
+      });
+
+      rowsSummary += `
+        <tr>
+          <th>الإجمالي الكلي</th>
+          <th>${sa.totalInspected}</th>
+          <th>${sa.totalDefective}</th>
+          <th>${sa.overallRate.toFixed(2)}%</th>
+        </tr>
+        <tr><td colspan="10"></td></tr>
+        <tr><th colspan="4">تحليل العيوب التراكمي للوردية</th></tr>
+        <tr>
+          <th>نوع العيب</th>
+          <th>العدد</th>
+          <th>النسبة من العيوب %</th>
+          <th>المقاسات</th>
+        </tr>
+      `;
+
+      if (sa.sortedDefects.length > 0) {
+        sa.sortedDefects.forEach((d) => {
+          const pct = sa.totalLoggedDefectUnits > 0 ? ((d.count / sa.totalLoggedDefectUnits) * 100).toFixed(2) : "0.00";
+          rowsSummary += `
+            <tr>
+              <td>${escXml(d.name)}</td>
+              <td>${d.count}</td>
+              <td>${pct}%</td>
+              <td>${escXml(Array.from(d.sizes).join(", "))}</td>
+            </tr>
+          `;
+        });
+      } else {
+        rowsSummary += `<tr><td colspan="4">لا توجد عيوب مسجلة</td></tr>`;
+      }
+
+      const htmlExcel = `
+        <html xmlns:o="urn:schemas-microsoft-com:office:office"
+              xmlns:x="urn:schemas-microsoft-com:office:excel"
+              xmlns="http://www.w3.org/TR/REC-html40">
+        <head>
+          <meta charset="UTF-8" />
+          <style>
+            table { border-collapse: collapse; direction: rtl; font-family: Tahoma, Arial, sans-serif; }
+            th, td { border: 1px solid #94a3b8; padding: 6px 10px; text-align: center; }
+            th { background-color: #dbeafe; font-weight: bold; }
+          </style>
+        </head>
+        <body>
+          <table>
+            ${rowsDetailed}
+            ${rowsSummary}
+          </table>
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob(["\uFEFF" + htmlExcel], { type: "application/vnd.ms-excel;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const safeDate = (state.date || getTodayYYYYMMDD()).replace(/[^0-9-]/g, "");
+      a.href = url;
+      a.download = `GloveOps_Report_${safeDate}.xls`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setStatusText("تم تنزيل ملف إكسيل بنجاح");
     }
 
     function resetShift() {
