@@ -693,14 +693,20 @@
       renumberBatches();
     }
 
+    function getFirebaseEndpoint(withCacheBust = false) {
+      const cleanBase = FIREBASE_DB_URL.replace(/\/+$/, "");
+      const cleanNode = FIREBASE_NODE.startsWith("/") ? FIREBASE_NODE : "/" + FIREBASE_NODE;
+      return withCacheBust ? `${cleanBase}${cleanNode}?t=${Date.now()}` : `${cleanBase}${cleanNode}`;
+    }
+
     async function syncFromFirebase(showFeedback = false) {
       if (showFeedback) setStatusText("جاري المزامنة...");
       try {
-        const res = await fetch(`${FIREBASE_DB_URL}${FIREBASE_NODE}?t=${Date.now()}`, {
+        const res = await fetch(getFirebaseEndpoint(true), {
           method: "GET",
           cache: "no-store"
         });
-        if (!res.ok) throw new Error("Firebase fetch failed");
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const remoteData = await res.json();
         if (remoteData && Array.isArray(remoteData.batches) && remoteData.batches.length > 0) {
           applyParsedState(remoteData);
@@ -709,11 +715,10 @@
           setStatusText(showFeedback ? "تمت المزامنة من السيرفر" : "متصل بالسيرفر");
           return;
         }
-        // If remote is empty, push local state if available
         await pushToFirebase(showFeedback);
       } catch (e) {
         console.error(e);
-        setStatusText("محفوظ محلياً (تعذر الاتصال بالسيرفر)", true);
+        setStatusText(`محفوظ محلياً (تعذر الاتصال: ${e.message || "Network"})`, true);
       }
     }
 
@@ -724,16 +729,16 @@
         updatedAt: Date.now()
       };
       try {
-        const res = await fetch(`${FIREBASE_DB_URL}${FIREBASE_NODE}`, {
+        const res = await fetch(getFirebaseEndpoint(false), {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
-        if (!res.ok) throw new Error("Firebase write failed");
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         setStatusText(showFeedback ? "تم الحفظ على السيرفر" : "محفوظ على السيرفر");
       } catch (e) {
         console.error(e);
-        setStatusText(showFeedback ? "تم الحفظ محلياً (بدون إنترنت)" : "محفوظ محلياً", true);
+        setStatusText(showFeedback ? "تم الحفظ محلياً (بدون إنترنت)" : `محفوظ محلياً (${e.message || "Offline"})`, true);
       }
     }
 
