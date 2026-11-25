@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GloveOps — إدارة ورديات الجوانتيات الطبية</title>
+  <style>
+    :root {
+      --bg: #f3f6f9;
+      --card: #ffffff;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --primary: #0f4c81;
+      --primary-dark: #093256;
+      --accent: #0d9488;
+      --whatsapp: #16a34a;
+      --whatsapp-dark: #15803d;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --ok: #15803d;
+      --ok-bg: #f0fdf4;
+      --radius: 14px;
+      --shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+    }
+
+    .container {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 18px 16px 64px;
+    }
+
+    .shift-header {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    .brand-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 14px;
+      margin-bottom: 16px;
+    }
+
+    .brand-title {
+      margin: 0;
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .shift-fields {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 5px;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid #cbd5e1;
+      border-radius: 9px;
+      font-size: 0.92rem;
+      font-family: inherit;
+      background: #fff;
+      color: var(--ink);
+    }
+
+    .field input:focus,
+    .field select:focus {
+      outline: 2px solid rgba(15, 76, 129, 0.25);
+      border-color: var(--primary);
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button,
+    a.btn-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 14px;
+      border-radius: 9px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      text-decoration: none;
+      border: 1px solid transparent;
+      transition: transform 0.08s ease, opacity 0.15s ease, background 0.15s ease;
+    }
+
+    button:active,
+    a.btn-link:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-accent {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-accent:hover {
+      opacity: 0.92;
+    }
+
+    .btn-outline {
+      background: #fff;
+      color: var(--ink);
+      border-color: #cbd5e1;
+    }
+
+    .btn-outline:hover {
+      background: #f8fafc;
+    }
+
+    .btn-danger-outline {
+      background: #fff;
+      color: var(--danger);
+      border-color: #fecaca;
+    }
+
+    .btn-danger-outline:hover {
+      background: var(--danger-bg);
+    }
+
+    .btn-whatsapp {
+      background: var(--whatsapp);
+      color: #fff;
+    }
+
+    .btn-whatsapp:hover {
+      background: var(--whatsapp-dark);
+    }
+
+    .save-status {
+      margin-right: auto;
+      font-size: 0.82rem;
+      color: var(--ok);
+      font-weight: 700;
+    }
+
+    .section-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin: 22px 0 12px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .batch-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+
+    .batch-top {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+
+    .batch-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .batch-num {
+      background: var(--primary);
+      color: #fff;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .time-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .time-group input[type="time"] {
+      padding: 6px 9px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.88rem;
+    }
+
+    .btn-now {
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      background: #e2e8f0;
+      color: #1e293b;
+      border-radius: 7px;
+    }
+
+    .btn-now:hover {
+      background: #cbd5e1;
+    }
+
+    .sizes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+    }
+
+    .size-box {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+      background: #fafbfd;
+    }
+
+    .size-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px dashed #cbd5e1;
+    }
+
+    .size-tag {
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--primary);
+      background: #e0f2fe;
+      padding: 2px 10px;
+      border-radius: 6px;
+    }
+
+    .size-rate {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .two-nums {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .two-nums label {
+      display: block;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    .two-nums input {
+      width: 100%;
+      padding: 7px 8px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      font-size: 0.9rem;
+      background: #fff;
+    }
+
+    .defects-area {
+      border-top: 1px solid #e2e8f0;
+      padding-top: 9px;
+      margin-top: 6px;
+    }
+
+    .defects-title {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: #334155;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .defect-row {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 7px;
+      margin-bottom: 7px;
+    }
+
+    .defect-controls {
+      display: grid;
+      grid-template-columns: 1fr 74px auto;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .defect-controls select,
+    .defect-controls input[type="number"] {
+      padding: 5px 6px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-family: inherit;
+      width: 100%;
+    }
+
+    .custom-defect-input {
+      margin-top: 6px;
+      width: 100%;
+      padding: 5px 8px;
+      border: 1px solid #93c5fd;
+      background: #eff6ff;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-family: inherit;
+    }
+
+    .btn-remove-sm {
+      padding: 4px 7px;
+      font-size: 0.76rem;
+      background: #fee2e2;
+      color: #b91c1c;
+      border-radius: 6px;
+    }
+
+    .btn-add-defect {
+      padding: 5px 9px;
+      font-size: 0.76rem;
+      background: #f1f5f9;
+      color: #0f4c81;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+    }
+
+    .analysis-box {
+      margin-top: 14px;
+      background: #f8fafc;
+      border: 1px solid #dbeafe;
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .analysis-title {
+      margin: 0 0 10px;
+      font-size: 0.96rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .kpi-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+
+    .kpi-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .kpi-val {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--ink);
+      margin-top: 2px;
+    }
+
+    .bar-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .bar-item {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+
+    .bar-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .bar-track {
+      height: 7px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 999px;
+    }
+
+    .final-report {
+      background: var(--card);
+      border: 2px solid var(--primary);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-top: 24px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin: 12px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      background: #fff;
+    }
+
+    th,
+    td {
+      border: 1px solid var(--line);
+      padding: 8px 10px;
+      text-align: center;
+    }
+
+    th {
+      background: #eff6ff;
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 28px 16px;
+      background: #fff;
+      border: 1px dashed #cbd5e1;
+      border-radius: var(--radius);
+      color: var(--muted);
+    }
+
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      body {
+        background: #fff;
+      }
+      .batch-card,
+      .final-report,
+      .shift-header {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+    }
+  </style>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0f4c81" />
+</head>
+<body>
+  <div class="container">
+    <header class="shift-header">
+      <div class="brand-row">
+        <h1 class="brand-title">GloveOps — متابعة ورديات فرز الجوانتيات الطبية</h1>
+      </div>
+
+      <div class="shift-fields">
+        <div class="field">
+          <label for="engineerName">اسم مهندس الوردية</label>
+          <input type="text" id="engineerName" placeholder="مثال: م. عمر أمين" />
+        </div>
+        <div class="field">
+          <label for="shiftName">الوردية</label>
+          <select id="shiftName">
+            <option value="الوردية الأولى">الوردية الأولى</option>
+            <option value="الوردية الثانية">الوردية الثانية</option>
+            <option value="الوردية الثالثة">الوردية الثالثة</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="shiftDate">التاريخ</label>
+          <input type="date" id="shiftDate" />
+        </div>
+      </div>
+
+      <div class="toolbar no-print">
+        <button type="button" class="btn-accent" onclick="addBatch()">+ إضافة فرزة جديدة (S • M • L • XL)</button>
+        <button type="button" class="btn-primary" onclick="saveState(true)">حفظ البيانات</button>
+        <button type="button" class="btn-outline" onclick="window.print()">طباعة</button>
+        <button type="button" class="btn-danger-outline" onclick="resetShift()">وردية جديدة</button>
+        <button type="button" class="btn-outline" onclick="syncFromFirebase(true)">مزامنة من السيرفر</button>
+        <a id="waFullHeader" class="btn-link btn-whatsapp" target="_blank" rel="noopener noreferrer">مشاركة التقرير النهائي على واتساب</a>
+        <span id="saveStatus" class="save-status">جاري الاتصال بالسيرفر...</span>
+      </div>
+    </header>
+
+    <div class="section-top">
+      <h2 class="section-title">الفرزات المسجلة (مجمّعة للمقاسات S • M • L • XL)</h2>
+      <button type="button" class="btn-accent no-print" onclick="addBatch()">+ إضافة فرزة</button>
+    </div>
+
+    <div id="batchesContainer"></div>
+
+    <section class="final-report" id="finalReportSection">
+      <div class="batch-top">
+        <h2 class="section-title" style="color: var(--primary);">التقرير النهائي وتحليل عيوب الوردية</h2>
+        <a id="waFullReport" class="btn-link btn-whatsapp no-print" target="_blank" rel="noopener noreferrer">مشاركة التقرير النهائي على واتساب</a>
+      </div>
+      <div id="finalReportContent"></div>
+    </section>
+  </div>
+
+  <script>
+    const SIZES = ["S", "M", "L", "XL"];
+    const STORAGE_KEY = "gloveops_shift_report_v9";
+    const FIREBASE_DB_URL = "https://glovesshefts-default-rtdb.firebaseio.com";
+    const FIREBASE_NODE = "/gloveops/currentShift.json";
+
+    const DEFECT_GROUPS = [
+      {
+        group: "Between finger",
+        items: ["Between finger - One hole", "Between finger - Thin spot", "Between finger - Multi holes"]
+      },
+      {
+        group: "Palm",
+        items: ["Palm - One hole", "Palm - Thin spot", "Palm - Multi holes"]
+      },
+      {
+        group: "Cuff",
+        items: ["Cuff - One hole", "Cuff - Thin spot", "Cuff - Multi holes"]
+      },
+      {
+        group: "General Defects",
+        items: ["Air cut", "Scum", "Dirt", "Slippage", "Bad beading"]
+      },
+      {
+        group: "أخرى",
+        items: ["عيب آخر"]
+      }
+    ];
+
+    function getCurrentTimeHHMM() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, "0");
+      const m = String(now.getMinutes()).padStart(2, "0");
+      return `${h}:${m}`;
+    }
+
+    function getTodayYYYYMMDD() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, "0");
+      const d = String(now.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    function createEmptySizeEntry() {
+      return {
+        inspected: "",
+        defective: "",
+        defects: []
+      };
+    }
+
+    function createEmptyBatch(index) {
+      return {
+        id: "batch_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7),
+        number: index,
+        time: getCurrentTimeHHMM(),
+        sizes: {
+          S: createEmptySizeEntry(),
+          M: createEmptySizeEntry(),
+          L: createEmptySizeEntry(),
+          XL: createEmptySizeEntry()
+        }
+      };
+    }
+
+    let state = {
+      engineer: "",
+      shift: "الوردية الأولى",
+      date: getTodayYYYYMMDD(),
+      batches: []
+    };
+
+    let firebasePushTimer = null;
+
+    function applyParsedState(parsed) {
+      if (!parsed || typeof parsed !== "object") return;
+      state.engineer = parsed.engineer || "";
+      state.shift = parsed.shift || "الوردية الأولى";
+      state.date = parsed.date || getTodayYYYYMMDD();
+      state.batches = Array.isArray(parsed.batches) ? parsed.batches : [];
+      if (state.batches.length === 0) {
+        state.batches.push(createEmptyBatch(1));
+      }
+      renumberBatches();
+    }
+
+    function setStatusText(text, isError = false) {
+      const el = document.getElementById("saveStatus");
+      if (!el) return;
+      el.textContent = text;
+      el.style.color = isError ? "#dc2626" : "#15803d";
+    }
+
+    function loadLocalOnly() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          applyParsedState(JSON.parse(raw));
+        }
+      } catch (e) {
+        console.error(e);
+      }
+      if (state.batches.length === 0) {
+        state.batches.push(createEmptyBatch(1));
+      }
+      renumberBatches();
+    }
+
+    async function syncFromFirebase(showFeedback = false) {
+      if (showFeedback) setStatusText("جاري المزامنة...");
+      try {
+        const res = await fetch(`${FIREBASE_DB_URL}${FIREBASE_NODE}?t=${Date.now()}`, {
+          method: "GET",
+          cache: "no-store"
+        });
+        if (!res.ok) throw new Error("Firebase fetch failed");
+        const remoteData = await res.json();
+        if (remoteData && Array.isArray(remoteData.batches) && remoteData.batches.length > 0) {
+          applyParsedState(remoteData);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+          renderAll();
+          setStatusText(showFeedback ? "تمت المزامنة من السيرفر" : "متصل بالسيرفر");
+          return;
+        }
+        // If remote is empty, push local state if available
+        await pushToFirebase(showFeedback);
+      } catch (e) {
+        console.error(e);
+        setStatusText("محفوظ محلياً (تعذر الاتصال بالسيرفر)", true);
+      }
+    }
+
+    async function pushToFirebase(showFeedback = false) {
+      renumberBatches();
+      const payload = {
+        ...state,
+        updatedAt: Date.now()
+      };
+      try {
+        const res = await fetch(`${FIREBASE_DB_URL}${FIREBASE_NODE}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error("Firebase write failed");
+        setStatusText(showFeedback ? "تم الحفظ على السيرفر" : "محفوظ على السيرفر");
+      } catch (e) {
+        console.error(e);
+        setStatusText(showFeedback ? "تم الحفظ محلياً (بدون إنترنت)" : "محفوظ محلياً", true);
+      }
+    }
+
+    function loadState() {
+      loadLocalOnly();
+      syncFromFirebase(false);
+    }
+
+    function renumberBatches() {
+      state.batches.forEach((b, idx) => {
+        b.number = idx + 1;
+      });
+    }
+
+    function saveState(showFeedback = false) {
+      renumberBatches();
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.error(e);
+      }
+      setStatusText(showFeedback ? "جاري الحفظ..." : "جاري المزامنة...");
+      if (firebasePushTimer) clearTimeout(firebasePushTimer);
+      if (showFeedback) {
+        pushToFirebase(true);
+      } else {
+        firebasePushTimer = setTimeout(() => {
+          pushToFirebase(false);
+        }, 450);
+      }
+    }
+
+    function addBatch() {
+      state.batches.push(createEmptyBatch(state.batches.length + 1));
+      saveState();
+      renderAll();
+    }
+
+    function removeBatch(batchId) {
+      state.batches = state.batches.filter((b) => b.id !== batchId);
+      if (state.batches.length === 0) {
+        state.batches.push(createEmptyBatch(1));
+      }
+      renumberBatches();
+      saveState();
+      renderAll();
+    }
+
+    function setBatchNow(batchId) {
+      const b = state.batches.find((x) => x.id === batchId);
+      if (b) {
+        b.time = getCurrentTimeHHMM();
+        saveState();
+        renderAll();
+      }
+    }
+
+    function addDefectRow(batchId, sizeKey) {
+      const b = state.batches.find((x) => x.id === batchId);
+      if (!b) return;
+      b.sizes[sizeKey].defects.push({
+        id: "def_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+        type: "Between finger - One hole",
+        customName: "",
+        count: ""
+      });
+      saveState();
+      renderAll();
+    }
+
+    function removeDefectRow(batchId, sizeKey, defectId) {
+      const b = state.batches.find((x) => x.id === batchId);
+      if (!b) return;
+      b.sizes[sizeKey].defects = b.sizes[sizeKey].defects.filter((d) => d.id !== defectId);
+      saveState();
+      renderAll();
+    }
+
+    function getDefectLabel(defObj) {
+      if (defObj.type === "عيب آخر") {
+        const custom = (defObj.customName || "").trim();
+        return custom ? custom : "عيب آخر";
+      }
+      return defObj.type;
+    }
+
+    function analyzeBatch(batch) {
+      let totalInspected = 0;
+      let totalDefective = 0;
+      const bySize = {};
+      const defectMap = {};
+
+      SIZES.forEach((sz) => {
+        const entry = batch.sizes[sz];
+        const insp = Number(entry.inspected) || 0;
+        const def = Number(entry.defective) || 0;
+        totalInspected += insp;
+        totalDefective += def;
+
+        let defectItemsSum = 0;
+        entry.defects.forEach((d) => {
+          const c = Number(d.count) || 0;
+          defectItemsSum += c;
+          const label = getDefectLabel(d);
+          if (!defectMap[label]) {
+            defectMap[label] = { name: label, count: 0, sizes: new Set() };
+          }
+          defectMap[label].count += c;
+          if (c > 0 || def > 0) defectMap[label].sizes.add(sz);
+        });
+
+        bySize[sz] = {
+          inspected: insp,
+          defective: def,
+          defectItemsSum,
+          rate: insp > 0 ? ((def / insp) * 100) : 0
+        };
+      });
+
+      const rate = totalInspected > 0 ? ((totalDefective / totalInspected) * 100) : 0;
+
+      let topSize = "—";
+      let maxSizeDef = -1;
+      SIZES.forEach((sz) => {
+        if (bySize[sz].defective > maxSizeDef && bySize[sz].defective > 0) {
+          maxSizeDef = bySize[sz].defective;
+          topSize = `${sz} (${bySize[sz].defective})`;
+        }
+      });
+
+      const sortedDefects = Object.values(defectMap)
+        .filter((item) => item.count > 0)
+        .sort((a, b) => b.count - a.count);
+
+      const totalDefectCount = sortedDefects.reduce((acc, item) => acc + item.count, 0);
+
+      return {
+        totalInspected,
+        totalDefective,
+        rate,
+        bySize,
+        topSize,
+        sortedDefects,
+        totalDefectCount
+      };
+    }
+
+    function analyzeAllShift() {
+      let totalInspected = 0;
+      let totalDefective = 0;
+      const sizeTotals = {};
+      SIZES.forEach((sz) => {
+        sizeTotals[sz] = { inspected: 0, defective: 0 };
+      });
+
+      const defectTotals = {};
+      let highestRateBatch = null;
+
+      state.batches.forEach((b) => {
+        const ba = analyzeBatch(b);
+        totalInspected += ba.totalInspected;
+        totalDefective += ba.totalDefective;
+
+        if (ba.totalInspected > 0) {
+          if (!highestRateBatch || ba.rate > highestRateBatch.rate) {
+            highestRateBatch = { number: b.number, time: b.time, rate: ba.rate, defective: ba.totalDefective };
+          }
+        }
+
+        SIZES.forEach((sz) => {
+          sizeTotals[sz].inspected += ba.bySize[sz].inspected;
+          sizeTotals[sz].defective += ba.bySize[sz].defective;
+        });
+
+        ba.sortedDefects.forEach((d) => {
+          if (!defectTotals[d.name]) {
+            defectTotals[d.name] = { name: d.name, count: 0, sizes: new Set() };
+          }
+          defectTotals[d.name].count += d.count;
+          d.sizes.forEach((s) => defectTotals[d.name].sizes.add(s));
+        });
+      });
+
+      const overallRate = totalInspected > 0 ? ((totalDefective / totalInspected) * 100) : 0;
+
+      let topDefectSize = "—";
+      let maxSzDef = -1;
+      SIZES.forEach((sz) => {
+        if (sizeTotals[sz].defective > maxSzDef && sizeTotals[sz].defective > 0) {
+          maxSzDef = sizeTotals[sz].defective;
+          topDefectSize = `${sz} (${sizeTotals[sz].defective})`;
+        }
+      });
+
+      const sortedDefects = Object.values(defectTotals)
+        .filter((x) => x.count > 0)
+        .sort((a, b) => b.count - a.count);
+
+      const totalLoggedDefectUnits = sortedDefects.reduce((sum, x) => sum + x.count, 0);
+
+      return {
+        totalInspected,
+        totalDefective,
+        overallRate,
+        sizeTotals,
+        topDefectSize,
+        highestRateBatch,
+        sortedDefects,
+        totalLoggedDefectUnits
+      };
+    }
+
+    function buildBatchWhatsAppText(batch) {
+      const ba = analyzeBatch(batch);
+      const lines = [
+        `*تقرير فرزة رقم (${batch.number})*`,
+        `المهندس: ${state.engineer || "غير محدد"} | الوردية: ${state.shift} | التاريخ: ${state.date}`,
+        `معاد الفرزة: ${batch.time || "--:--"}`,
+        `--------------------------`
+      ];
+
+      SIZES.forEach((sz) => {
+        const s = ba.bySize[sz];
+        const defsText =
+          batch.sizes[sz].defects
+            .filter((d) => (Number(d.count) || 0) > 0 || getDefectLabel(d) !== "")
+            .map((d) => {
+              const lbl = getDefectLabel(d);
+              const c = Number(d.count) || 0;
+              return `${lbl} (${c})`;
+            })
+            .join("، ") || "لا يوجد";
+        lines.push(`• مقاس ${sz}: مفروز ${s.inspected} | معيب ${s.defective} (${s.rate.toFixed(1)}%) | العيوب: ${defsText}`);
+      });
+
+      lines.push(`--------------------------`);
+      lines.push(`إجمالي الفرزة: مفروز ${ba.totalInspected} | معيب ${ba.totalDefective} | النسبة: ${ba.rate.toFixed(1)}%`);
+      lines.push(`*تحليل عيوب الفرزة:*`);
+      lines.push(`- أعلى مقاس عيوباً: ${ba.topSize}`);
+
+      if (ba.sortedDefects.length > 0) {
+        ba.sortedDefects.forEach((d) => {
+          const pct = ba.totalDefectCount > 0 ? ((d.count / ba.totalDefectCount) * 100).toFixed(1) : "0.0";
+          lines.push(`- ${d.name}: ${d.count} (${pct}%) [المقاسات: ${Array.from(d.sizes).join(", ")}]`);
+        });
+      } else {
+        lines.push(`- لا توجد عيوب مسجلة في هذه الفرزة.`);
+      }
+
+      return lines.join("\n");
+    }
+
+    function buildFullShiftWhatsAppText() {
+      const sa = analyzeAllShift();
+      const lines = [
+        `*التقرير النهائي للوردية*`,
+        `المهندس: ${state.engineer || "غير محدد"} | الوردية: ${state.shift} | التاريخ: ${state.date}`,
+        `عدد الفرزات: ${state.batches.length}`,
+        `إجمالي المفروز: ${sa.totalInspected} | إجمالي المعيب: ${sa.totalDefective} | نسبة العيوب: ${sa.overallRate.toFixed(2)}%`,
+        `--------------------------`,
+        `*ملخص المقاسات:*`
+      ];
+
+      SIZES.forEach((sz) => {
+        const st = sa.sizeTotals[sz];
+        const r = st.inspected > 0 ? ((st.defective / st.inspected) * 100).toFixed(1) : "0.0";
+        lines.push(`• ${sz}: مفروز ${st.inspected} | معيب ${st.defective} (${r}%)`);
+      });
+
+      lines.push(`--------------------------`);
+      lines.push(`*تحليل العيوب النهائي للوردية:*`);
+      lines.push(`- أكثر مقاس به عيوب: ${sa.topDefectSize}`);
+      if (sa.highestRateBatch) {
+        lines.push(`- أعلى فرزة في نسبة العيوب: فرزة #${sa.highestRateBatch.number} (${sa.highestRateBatch.rate.toFixed(1)}%)`);
+      }
+
+      if (sa.sortedDefects.length > 0) {
+        sa.sortedDefects.forEach((d) => {
+          const pct = sa.totalLoggedDefectUnits > 0 ? ((d.count / sa.totalLoggedDefectUnits) * 100).toFixed(1) : "0.0";
+          lines.push(`- ${d.name}: ${d.count} (${pct}%) [المقاسات: ${Array.from(d.sizes).join(", ")}]`);
+        });
+      } else {
+        lines.push(`- لا توجد عيوب مسجلة خلال الوردية.`);
+      }
+
+      return lines.join("\n");
+    }
+
+    function toWhatsAppUrl(text) {
+      return "https://api.whatsapp.com/send?text=" + encodeURIComponent(text);
+    }
+
+    function renderBatches() {
+      const container = document.getElementById("batchesContainer");
+      if (!container) return;
+
+      if (state.batches.length === 0) {
+        container.innerHTML = `<div class="empty-state">لا توجد فرزات مسجلة. اضغط على "+ إضافة فرزة".</div>`;
+        return;
+      }
+
+      container.innerHTML = state.batches
+        .map((batch, idx) => {
+          const ba = analyzeBatch(batch);
+          const batchWaUrl = toWhatsAppUrl(buildBatchWhatsAppText(batch));
+
+          const sizeCardsHtml = SIZES.map((sz) => {
+            const entry = batch.sizes[sz];
+            const szStats = ba.bySize[sz];
+
+            const defectRowsHtml = entry.defects
+              .map((defObj) => {
+                const isCustom = defObj.type === "عيب آخر";
+                const optGroupsHtml = DEFECT_GROUPS.map((grp) => {
+                  const opts = grp.items
+                    .map((item) => {
+                      const sel = defObj.type === item ? "selected" : "";
+                      return `<option value="${escapeHtml(item)}" ${sel}>${escapeHtml(item)}</option>`;
+                    })
+                    .join("");
+                  return `<optgroup label="${escapeHtml(grp.group)}">${opts}</optgroup>`;
+                }).join("");
+
+                return `
+                  <div class="defect-row">
+                    <div class="defect-controls">
+                      <select data-batch="${batch.id}" data-size="${sz}" data-defect="${defObj.id}" data-field="type">
+                        ${optGroupsHtml}
+                      </select>
+                      <input type="number" min="0" placeholder="العدد" value="${escapeHtml(String(defObj.count ?? ""))}"
+                        data-batch="${batch.id}" data-size="${sz}" data-defect="${defObj.id}" data-field="count" />
+                      <button type="button" class="btn-remove-sm no-print" onclick="removeDefectRow('${batch.id}', '${sz}', '${defObj.id}')">حذف</button>
+                    </div>
+                    ${
+                      isCustom
+                        ? `<input type="text" class="custom-defect-input" placeholder="اكتب اسم العيب الإضافي..." value="${escapeHtml(defObj.customName || "")}"
+                            data-batch="${batch.id}" data-size="${sz}" data-defect="${defObj.id}" data-field="customName" />`
+                        : ""
+                    }
+                  </div>
+                `;
+              })
+              .join("");
+
+            return `
+              <div class="size-box">
+                <div class="size-head">
+                  <span class="size-tag">مقاس ${sz}</span>
+                  <span class="size-rate">نسبة العيوب: ${szStats.rate.toFixed(1)}%</span>
+                </div>
+                <div class="two-nums">
+                  <div>
+                    <label>المفروز</label>
+                    <input type="number" min="0" placeholder="0" value="${escapeHtml(String(entry.inspected ?? ""))}"
+                      data-batch="${batch.id}" data-size="${sz}" data-field="inspected" />
+                  </div>
+                  <div>
+                    <label>المعيب</label>
+                    <input type="number" min="0" placeholder="0" value="${escapeHtml(String(entry.defective ?? ""))}"
+                      data-batch="${batch.id}" data-size="${sz}" data-field="defective" />
+                  </div>
+                </div>
+                <div class="defects-area">
+                  <div class="defects-title">
+                    <span>العيوب</span>
+                    <button type="button" class="btn-add-defect no-print" onclick="addDefectRow('${batch.id}', '${sz}')">+ إضافة عيب</button>
+                  </div>
+                  ${defectRowsHtml || `<div style="font-size:0.78rem; color:var(--muted);">لا توجد عيوب مضافة</div>`}
+                </div>
+              </div>
+            `;
+          }).join("");
+
+          const defectBarsHtml =
+            ba.sortedDefects.length > 0
+              ? ba.sortedDefects
+                  .map((d) => {
+                    const pct = ba.totalDefectCount > 0 ? (d.count / ba.totalDefectCount) * 100 : 0;
+                    return `
+                      <div class="bar-item">
+                        <div class="bar-meta">
+                          <span>${escapeHtml(d.name)} (${Array.from(d.sizes).join(", ")})</span>
+                          <span>${d.count} (${pct.toFixed(1)}%)</span>
+                        </div>
+                        <div class="bar-track">
+                          <div class="bar-fill" style="width:${Math.min(100, pct).toFixed(1)}%"></div>
+                        </div>
+                      </div>
+                    `;
+                  })
+                  .join("")
+              : `<div style="font-size:0.84rem; color:var(--muted);">لم يتم تسجيل أعداد تفصيلية للعيوب في هذه الفرزة بعد.</div>`;
+
+          return `
+            <article class="batch-card">
+              <div class="batch-top">
+                <div class="batch-meta">
+                  <span class="batch-num">فرزة #${idx + 1}</span>
+                  <div class="time-group">
+                    <label for="time_${batch.id}" style="font-size:0.82rem; font-weight:700; color:var(--muted);">معاد الفرزة:</label>
+                    <input type="time" id="time_${batch.id}" value="${escapeHtml(batch.time || "")}"
+                      data-batch="${batch.id}" data-field="time" />
+                    <button type="button" class="btn-now no-print" onclick="setBatchNow('${batch.id}')">الآن</button>
+                  </div>
+                </div>
+                <div class="toolbar no-print">
+                  <a href="${batchWaUrl}" class="btn-link btn-whatsapp" target="_blank" rel="noopener noreferrer">مشاركة هذه الفرزة على واتساب</a>
+                  <button type="button" class="btn-danger-outline" onclick="removeBatch('${batch.id}')">حذف الفرزة</button>
+                </div>
+              </div>
+
+              <div class="sizes-grid">
+                ${sizeCardsHtml}
+              </div>
+
+              <div class="analysis-box">
+                <h3 class="analysis-title">تحليل عيوب الفرزة #${idx + 1}</h3>
+                <div class="kpi-strip">
+                  <div class="kpi-card">
+                    <div class="kpi-label">إجمالي المفروز</div>
+                    <div class="kpi-val">${ba.totalInspected}</div>
+                  </div>
+                  <div class="kpi-card">
+                    <div class="kpi-label">إجمالي المعيب</div>
+                    <div class="kpi-val" style="color:var(--danger);">${ba.totalDefective}</div>
+                  </div>
+                  <div class="kpi-card">
+                    <div class="kpi-label">نسبة العيوب</div>
+                    <div class="kpi-val">${ba.rate.toFixed(1)}%</div>
+                  </div>
+                  <div class="kpi-card">
+                    <div class="kpi-label">أعلى مقاس عيوباً</div>
+                    <div class="kpi-val">${escapeHtml(ba.topSize)}</div>
+                  </div>
+                </div>
+                <div class="bar-list">${defectBarsHtml}</div>
+              </div>
+            </article>
+          `;
+        })
+        .join("");
+    }
+
+    function renderFinalReport() {
+      const sa = analyzeAllShift();
+      const fullText = buildFullShiftWhatsAppText();
+      const waUrl = toWhatsAppUrl(fullText);
+
+      const hBtn = document.getElementById("waFullHeader");
+      const rBtn = document.getElementById("waFullReport");
+      if (hBtn) hBtn.href = waUrl;
+      if (rBtn) rBtn.href = waUrl;
+
+      const sizeRowsHtml = SIZES.map((sz) => {
+        const st = sa.sizeTotals[sz];
+        const r = st.inspected > 0 ? ((st.defective / st.inspected) * 100).toFixed(1) : "0.0";
+        return `
+          <tr>
+            <td><strong>${sz}</strong></td>
+            <td>${st.inspected}</td>
+            <td>${st.defective}</td>
+            <td>${r}%</td>
+          </tr>
+        `;
+      }).join("");
+
+      const defectRowsHtml =
+        sa.sortedDefects.length > 0
+          ? sa.sortedDefects
+              .map((d) => {
+                const pct = sa.totalLoggedDefectUnits > 0 ? ((d.count / sa.totalLoggedDefectUnits) * 100).toFixed(1) : "0.0";
+                return `
+                  <tr>
+                    <td><strong>${escapeHtml(d.name)}</strong></td>
+                    <td>${d.count}</td>
+                    <td>${pct}%</td>
+                    <td>${escapeHtml(Array.from(d.sizes).join(", "))}</td>
+                  </tr>
+                `;
+              })
+              .join("")
+          : `<tr><td colspan="4" style="color:var(--muted);">لا توجد عيوب مسجلة</td></tr>`;
+
+      const el = document.getElementById("finalReportContent");
+      if (!el) return;
+
+      el.innerHTML = `
+        <div class="kpi-strip">
+          <div class="kpi-card">
+            <div class="kpi-label">عدد الفرزات</div>
+            <div class="kpi-val">${state.batches.length}</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">إجمالي المفروز بالوردية</div>
+            <div class="kpi-val">${sa.totalInspected}</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">إجمالي المعيب بالوردية</div>
+            <div class="kpi-val" style="color:var(--danger);">${sa.totalDefective}</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">نسبة العيوب الكلية</div>
+            <div class="kpi-val">${sa.overallRate.toFixed(2)}%</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">أكثر مقاس تأثراً بالعيوب</div>
+            <div class="kpi-val">${escapeHtml(sa.topDefectSize)}</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">أعلى فرزة في نسبة العيوب</div>
+            <div class="kpi-val">${sa.highestRateBatch ? `فرزة #${sa.highestRateBatch.number} (${sa.highestRateBatch.rate.toFixed(1)}%)` : "—"}</div>
+          </div>
+        </div>
+
+        <h3 class="analysis-title">ملخص المقاسات (S • M • L • XL)</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>المقاس</th>
+                <th>إجمالي المفروز</th>
+                <th>إجمالي المعيب</th>
+                <th>نسبة العيوب</th>
+              </tr>
+            </thead>
+            <tbody>${sizeRowsHtml}</tbody>
+          </table>
+        </div>
+
+        <h3 class="analysis-title">تحليل العيوب التراكمي للوردية</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>نوع العيب</th>
+                <th>العدد</th>
+                <th>النسبة من العيوب</th>
+                <th>المقاسات</th>
+              </tr>
+            </thead>
+            <tbody>${defectRowsHtml}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderAll() {
+      document.getElementById("engineerName").value = state.engineer;
+      document.getElementById("shiftName").value = state.shift;
+      document.getElementById("shiftDate").value = state.date;
+      renderBatches();
+      renderFinalReport();
+    }
+
+    function resetShift() {
+      if (!confirm("هل تريد بدء وردية جديدة ومسح بيانات الوردية الحالية؟")) return;
+      state = {
+        engineer: state.engineer,
+        shift: state.shift,
+        date: getTodayYYYYMMDD(),
+        batches: [createEmptyBatch(1)]
+      };
+      saveState(true);
+      renderAll();
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    document.getElementById("engineerName").addEventListener("input", (e) => {
+      state.engineer = e.target.value;
+      saveState();
+      renderFinalReport();
+      updateBatchShareLinksOnly();
+    });
+
+    document.getElementById("shiftName").addEventListener("change", (e) => {
+      state.shift = e.target.value;
+      saveState();
+      renderFinalReport();
+      updateBatchShareLinksOnly();
+    });
+
+    document.getElementById("shiftDate").addEventListener("change", (e) => {
+      state.date = e.target.value;
+      saveState();
+      renderFinalReport();
+      updateBatchShareLinksOnly();
+    });
+
+    function updateBatchShareLinksOnly() {
+      const cards = document.querySelectorAll(".batch-card");
+      state.batches.forEach((b, i) => {
+        if (cards[i]) {
+          const link = cards[i].querySelector("a.btn-whatsapp");
+          if (link) link.href = toWhatsAppUrl(buildBatchWhatsAppText(b));
+        }
+      });
+    }
+
+    document.getElementById("batchesContainer").addEventListener("input", (e) => {
+      const target = e.target;
+      const batchId = target.getAttribute("data-batch");
+      if (!batchId) return;
+      const batch = state.batches.find((b) => b.id === batchId);
+      if (!batch) return;
+
+      const field = target.getAttribute("data-field");
+      const sizeKey = target.getAttribute("data-size");
+      const defectId = target.getAttribute("data-defect");
+
+      if (field === "time") {
+        batch.time = target.value;
+        saveState();
+        renderFinalReport();
+        updateBatchShareLinksOnly();
+        return;
+      }
+
+      if (sizeKey && !defectId) {
+        batch.sizes[sizeKey][field] = target.value;
+        saveState();
+        renderFinalReport();
+        updateBatchShareLinksOnly();
+        return;
+      }
+
+      if (sizeKey && defectId) {
+        const defObj = batch.sizes[sizeKey].defects.find((d) => d.id === defectId);
+        if (!defObj) return;
+        if (field === "type") {
+          defObj.type = target.value;
+          saveState();
+          renderAll();
+          return;
+        }
+        if (field === "count") {
+          defObj.count = target.value;
+          saveState();
+          renderFinalReport();
+          updateBatchShareLinksOnly();
+          return;
+        }
+        if (field === "customName") {
+          defObj.customName = target.value;
+          saveState();
+          renderFinalReport();
+          updateBatchShareLinksOnly();
+        }
+      }
+    });
+
+    document.getElementById("batchesContainer").addEventListener("change", (e) => {
+      const target = e.target;
+      if (target.tagName === "SELECT" && target.getAttribute("data-field") === "type") {
+        const batchId = target.getAttribute("data-batch");
+        const sizeKey = target.getAttribute("data-size");
+        const defectId = target.getAttribute("data-defect");
+        const batch = state.batches.find((b) => b.id === batchId);
+        if (!batch) return;
+        const defObj = batch.sizes[sizeKey].defects.find((d) => d.id === defectId);
+        if (!defObj) return;
+        defObj.type = target.value;
+        saveState();
+        renderAll();
+      }
+    });
+
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch((err) => console.log("SW reg:", err));
+      });
+    }
+
+    loadState();
+    renderAll();
+  </script>
+</body>
+</html>
