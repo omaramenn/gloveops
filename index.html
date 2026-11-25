@@ -659,12 +659,48 @@
 
     let firebasePushTimer = null;
 
+    function normalizeSizeEntry(rawEntry) {
+      if (!rawEntry || typeof rawEntry !== "object") {
+        return createEmptySizeEntry();
+      }
+      const defects = Array.isArray(rawEntry.defects)
+        ? rawEntry.defects
+            .filter((d) => d && typeof d === "object")
+            .map((d) => ({
+              id: d.id || "def_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+              type: d.type || "Between finger - One hole",
+              customName: d.customName || "",
+              count: d.count ?? ""
+            }))
+        : [];
+      return {
+        inspected: rawEntry.inspected ?? "",
+        defective: rawEntry.defective ?? "",
+        defects
+      };
+    }
+
+    function normalizeBatch(rawBatch, idx) {
+      const rawSizes = rawBatch && typeof rawBatch.sizes === "object" && rawBatch.sizes !== null ? rawBatch.sizes : {};
+      const normalizedSizes = {};
+      SIZES.forEach((sz) => {
+        normalizedSizes[sz] = normalizeSizeEntry(rawSizes[sz]);
+      });
+      return {
+        id: (rawBatch && rawBatch.id) || "batch_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7),
+        number: idx + 1,
+        time: (rawBatch && rawBatch.time) || getCurrentTimeHHMM(),
+        sizes: normalizedSizes
+      };
+    }
+
     function applyParsedState(parsed) {
       if (!parsed || typeof parsed !== "object") return;
       state.engineer = parsed.engineer || "";
       state.shift = parsed.shift || "الوردية الأولى";
       state.date = parsed.date || getTodayYYYYMMDD();
-      state.batches = Array.isArray(parsed.batches) ? parsed.batches : [];
+      const rawBatches = Array.isArray(parsed.batches) ? parsed.batches : [];
+      state.batches = rawBatches.map((b, idx) => normalizeBatch(b, idx));
       if (state.batches.length === 0) {
         state.batches.push(createEmptyBatch(1));
       }
